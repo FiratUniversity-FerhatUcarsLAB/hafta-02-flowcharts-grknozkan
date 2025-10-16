@@ -1,0 +1,29 @@
+digraph AkilliEvGüvenlik {
+    rankdir=TB; // Yukarıdan aşağıya akış
+
+    // Düğüm tipleri
+    node [shape=oval]; basla; bitir;
+    node [shape=parallelogram]; sensör_başlat="Sensörleri Başlat";
+    node [shape=box]; 
+        oku_sensör="Sensörleri Oku";
+        tehdit_algılama="Tehdit Algıla";
+        alarm_ve_bildirim="Alarm ve Bildirim Gönder";
+        bekle="Bekle(1 sn)";
+    node [shape=diamond]; 
+        tehdit_var_mı="Tehdit Var mı?";
+
+    // Akış
+    basla -> sensör_başlat;
+    sensör_başlat -> oku_sensör;
+    oku_sensör -> tehdit_algılama;
+    tehdit_algılama -> tehdit_var_mı;
+    
+    tehdit_var_mı -> alarm_ve_bildirim [label="EVET"];
+    tehdit_var_mı -> bekle [label="HAYIR"];
+    
+    alarm_ve_bildirim -> bekle;
+    bekle -> oku_sensör [label="Sürekli"]; // Geri ok ile sonsuz döngü
+
+    // Bitir düğümü (normal şartlarda sonsuz döngü nedeniyle ulaşılmaz)
+    bitir;
+}
