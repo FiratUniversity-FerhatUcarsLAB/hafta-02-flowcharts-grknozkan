@@ -1,1 +1,62 @@
+digraph ATM_Para_Cekme {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=10];
 
+    start [shape=oval, label="BAŞLA"];
+    setVars [shape=box, label="PIN ← 1234\nbakiye ← 5000\ngünlük_limit ← 2000\nkalan_hak ← 3"];
+    
+    pinLoop [shape=diamond, label="kalan_hak > 0 ?"];
+    girPin [shape=parallelogram, label="PIN gir"];
+    dogrulaPin [shape=diamond, label="girilen_PIN = PIN ?"];
+    hataliPin [shape=box, label="kalan_hak ← kalan_hak - 1"];
+    kalanHakYaz [shape=parallelogram, label="\"Hatalı PIN! Kalan hak:\" kalan_hak"];
+    pinBloke [shape=parallelogram, label="\"3 kez hatalı giriş. Kart bloke oldu.\""];
+    bitir [shape=oval, label="BİTİR"];
+    pinDogrulandi [shape=parallelogram, label="\"PIN doğrulandı.\""];
+
+    islemler [shape=diamond, label="TEKRAR = 'E' ?"];
+    tutarGir [shape=parallelogram, label="\"Çekmek istediğiniz tutar:\""];
+    tutarBakiye [shape=diamond, label="tutar > bakiye ?"];
+    bakiyeYetersiz [shape=parallelogram, label="\"Yetersiz bakiye!\""];
+    tutarLimit [shape=diamond, label="tutar > günlük_limit ?"];
+    limitAsildi [shape=parallelogram, label="\"Günlük limit aşıldı!\""];
+    tutarMod [shape=diamond, label="tutar % 20 ≠ 0 ?"];
+    modHata [shape=parallelogram, label="\"20 TL'nin katı giriniz!\""];
+    paraCek [shape=box, label="bakiye ← bakiye - tutar\ngünlük_limit ← günlük_limit - tutar"];
+    basariliYaz [shape=parallelogram, label="\"İşlem başarılı.\"\n\"Kalan bakiye:\" bakiye\n\"Kalan günlük limit:\" günlük_limit"];
+    tekrarSor [shape=parallelogram, label="\"Başka işlem yapmak ister misiniz? (E/H)\""];
+    iyiGunler [shape=parallelogram, label="\"İyi günler dileriz!\""];
+
+    // Akış bağlantıları
+    start -> setVars -> pinLoop;
+    pinLoop -> girPin [label="Evet"];
+    pinLoop -> pinBloke [label="Hayır"];
+    pinBloke -> bitir;
+
+    girPin -> dogrulaPin;
+    dogrulaPin -> pinDogrulandi [label="Evet"];
+    dogrulaPin -> hataliPin [label="Hayır"];
+    hataliPin -> kalanHakYaz -> pinLoop;
+
+    pinDogrulandi -> islemler;
+    islemler -> tutarGir [label="Evet"];
+    islemler -> iyiGunler [label="Hayır"];
+    iyiGunler -> bitir;
+
+    tutarGir -> tutarBakiye;
+    tutarBakiye -> bakiyeYetersiz [label="Evet"];
+    tutarBakiye -> tutarLimit [label="Hayır"];
+    bakiyeYetersiz -> tekrarSor;
+
+    tutarLimit -> limitAsildi [label="Evet"];
+    tutarLimit -> tutarMod [label="Hayır"];
+    limitAsildi -> tekrarSor;
+
+    tutarMod -> modHata [label="Evet"];
+    tutarMod -> paraCek [label="Hayır"];
+    modHata -> tekrarSor;
+
+    paraCek -> basariliYaz -> tekrarSor;
+    tekrarSor -> islemler;
+
+}
