@@ -1,0 +1,57 @@
+digraph HastaneRandevu {
+    rankdir=TB;
+
+    // Şekil tanımları
+    node [shape=oval];
+    Basla [label="BAŞLA"];
+    Bitir [label="BİTİR"];
+
+    node [shape=parallelogram];
+    GirisKimlik [label="GİRİŞ: T.C. Kimlik No ve Şifre"];
+    SecilenPoliklinik [label="GİRİŞ: Seçilen Poliklinik"];
+    SecilenDoktor [label="GİRİŞ: Seçilen Doktor"];
+    SecilenSaat [label="GİRİŞ: Seçilen Saat"];
+
+    node [shape=box];
+    PoliklinikleriGoster [label="POLİKLİNİKLERİ GÖSTER"];
+    DoktorlariGoster [label="SEÇİLEN POLİKLİNİĞE AİT DOKTORLARI GÖSTER"];
+    SaatleriGoster [label="SEÇİLEN DOKTORUN UYGUN SAATLERİNİ GÖSTER"];
+    RandevuyuKaydet [label="Randevuyu Kaydet"];
+    SmsGonder [label="SMS Gönder"];
+
+    node [shape=diamond];
+    KimlikDogrulama [label="Kimlik doğrulandı mı?"];
+    SaatMusait [label="Seçilen saat müsait mi?"];
+    RandevuOlustu [label="Randevu oluşturuldu mu?"];
+
+    node [shape=parallelogram];
+    HataKimlik [label="Kimlik doğrulama başarısız!"];
+    SaatDolu [label="Seçilen saat dolu! Başka saat seçin"];
+    OnayMesaji [label="Randevunuz başarıyla oluşturuldu"];
+    SmsMesaji [label="Onay SMS’i gönderildi"];
+
+    // Akış okları
+    Basla -> GirisKimlik;
+    GirisKimlik -> KimlikDogrulama;
+    KimlikDogrulama -> PoliklinikleriGoster [label="EVET"];
+    KimlikDogrulama -> HataKimlik [label="HAYIR"];
+    HataKimlik -> Bitir;
+
+    PoliklinikleriGoster -> SecilenPoliklinik;
+    SecilenPoliklinik -> DoktorlariGoster;
+    DoktorlariGoster -> SecilenDoktor;
+    SecilenDoktor -> SaatleriGoster;
+    SaatleriGoster -> SecilenSaat;
+    SecilenSaat -> SaatMusait;
+
+    SaatMusait -> RandevuyuKaydet [label="EVET"];
+    SaatMusait -> SaatDolu [label="HAYIR"];
+    SaatDolu -> SaatleriGoster;
+
+    RandevuyuKaydet -> OnayMesaji;
+    OnayMesaji -> RandevuOlustu;
+
+    RandevuOlustu -> SmsGonder [label="EVET"];
+    SmsGonder -> SmsMesaji;
+    SmsMesaji -> Bitir;
+}
