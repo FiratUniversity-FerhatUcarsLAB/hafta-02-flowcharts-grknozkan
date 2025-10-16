@@ -1,0 +1,114 @@
+digraph E_Ticaret_Sistemi {
+    rankdir=TB;
+    node [fontname="Arial"];
+
+    // --- Kullanıcı Girişi ---
+    start [shape=oval, label="BAŞLA (Kullanıcı Girişi)"];
+    inputLogin [shape=parallelogram, label="Kullanıcı giriş bilgilerini al"];
+    checkLogin [shape=diamond, label="Bilgiler doğru mu?"];
+    startSession [shape=box, label="Oturumu başlat\nKullanıcı ID ata"];
+    loginFail [shape=box, label="Giriş başarısız\nSistemi sonlandır"];
+    endLogin [shape=oval, label="BİTİR (Giriş)"];
+
+    // --- Ürün Ekleme ---
+    startAdd [shape=oval, label="BAŞLA (Ürün Ekleme)"];
+    selectProduct [shape=parallelogram, label="Ürün ve miktarı al"];
+    checkStockAdd [shape=diamond, label="Ürün mevcut mu?"];
+    checkCart [shape=diamond, label="Ürün sepette var mı?"];
+    increaseQty [shape=box, label="Sepetteki miktarı artır"];
+    addToCart [shape=box, label="Ürünü sepete ekle"];
+    outOfStock [shape=box, label="Ürün stokta yok"];
+    endAdd [shape=oval, label="BİTİR (Ürün Ekleme)"];
+
+    // --- Stok Kontrolü ---
+    startStock [shape=oval, label="BAŞLA (Stok Kontrolü)"];
+    loopStock [shape=box, label="Her ürün için stok kontrolü"];
+    stockCheck [shape=diamond, label="Stok yeterli mi?"];
+    removeItem [shape=box, label="Yetersiz stok\nÜrünü sepetten kaldır"];
+    endStock [shape=oval, label="BİTİR (Stok Kontrolü)"];
+
+    // --- İndirim Kodu ---
+    startDiscount [shape=oval, label="BAŞLA (İndirim Kodu)"];
+    checkCodeInput [shape=diamond, label="Kullanıcı indirim kodu girdi mi?"];
+    readCode [shape=parallelogram, label="Kodu al"];
+    validCode [shape=diamond, label="Kod geçerli mi?"];
+    applyDiscount [shape=box, label="İndirimi uygula\nToplamı güncelle"];
+    invalidCode [shape=box, label="Kod geçersiz veya süresi dolmuş"];
+    endDiscount [shape=oval, label="BİTİR (İndirim Kodu)"];
+
+    // --- Kargo Hesaplama ---
+    startCargo [shape=oval, label="BAŞLA (Kargo Hesaplama)"];
+    getAddress [shape=parallelogram, label="Adres al"];
+    getShippingType [shape=parallelogram, label="Kargo türü seç"];
+    calcShipping [shape=box, label="Kargo ücretini hesapla"];
+    updateTotal [shape=box, label="Toplam tutarı güncelle"];
+    endCargo [shape=oval, label="BİTİR (Kargo Hesaplama)"];
+
+    // --- Ödeme ---
+    startPayment [shape=oval, label="BAŞLA (Ödeme)"];
+    paymentInfo [shape=parallelogram, label="Kart bilgilerini al"];
+    checkPayment [shape=diamond, label="Ödeme onaylandı mı?"];
+    createOrder [shape=box, label="Siparişi oluştur\nStoktan düş\nSepeti temizle"];
+    paymentFail [shape=box, label="Ödeme başarısız\nTekrar deneme seçeneği"];
+    endPayment [shape=oval, label="BİTİR (Ödeme)"];
+
+    // --- Sipariş Tamamlama ---
+    startConfirm [shape=oval, label="BAŞLA (Sipariş Tamamlama)"];
+    checkOrder [shape=diamond, label="Sipariş oluşturuldu mu?"];
+    sendMail [shape=box, label="E-posta ve SMS gönder\nKargo sürecini başlat"];
+    endConfirm [shape=oval, label="BİTİR (Sipariş Tamamlama)"];
+
+    // --- Sistem Sonu ---
+    endSystem [shape=oval, label="BİTİR (Sistem Sonu)"];
+
+    // --- Bağlantılar ---
+    start -> inputLogin -> checkLogin;
+    checkLogin -> startSession [label="EVET"];
+    checkLogin -> loginFail [label="HAYIR"];
+    startSession -> endLogin;
+    loginFail -> endLogin;
+
+    endLogin -> startAdd;
+    startAdd -> selectProduct -> checkStockAdd;
+    checkStockAdd -> checkCart [label="EVET"];
+    checkStockAdd -> outOfStock [label="HAYIR"];
+    checkCart -> increaseQty [label="EVET"];
+    checkCart -> addToCart [label="HAYIR"];
+    increaseQty -> endAdd;
+    addToCart -> endAdd;
+    outOfStock -> endAdd;
+
+    endAdd -> startStock;
+    startStock -> loopStock -> stockCheck;
+    stockCheck -> removeItem [label="HAYIR"];
+    stockCheck -> endStock [label="EVET"];
+    removeItem -> endStock;
+
+    endStock -> startDiscount;
+    startDiscount -> checkCodeInput;
+    checkCodeInput -> readCode [label="EVET"];
+    checkCodeInput -> endDiscount [label="HAYIR"];
+    readCode -> validCode;
+    validCode -> applyDiscount [label="EVET"];
+    validCode -> invalidCode [label="HAYIR"];
+    applyDiscount -> endDiscount;
+    invalidCode -> endDiscount;
+
+    endDiscount -> startCargo;
+    startCargo -> getAddress -> getShippingType -> calcShipping -> updateTotal -> endCargo;
+
+    endCargo -> startPayment;
+    startPayment -> paymentInfo -> checkPayment;
+    checkPayment -> createOrder [label="EVET"];
+    checkPayment -> paymentFail [label="HAYIR"];
+    createOrder -> endPayment;
+    paymentFail -> endPayment;
+
+    endPayment -> startConfirm;
+    startConfirm -> checkOrder;
+    checkOrder -> sendMail [label="EVET"];
+    checkOrder -> endConfirm [label="HAYIR"];
+    sendMail -> endConfirm;
+
+    endConfirm -> endSystem;
+}
